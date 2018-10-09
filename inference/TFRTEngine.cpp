@@ -44,8 +44,7 @@ TFRTEngine::~TFRTEngine() {
 	shutdownProtobufLibrary();
 }
 
-void TFRTEngine::addInput(string layer, nvinfer1::DimsCHW dims,
-		size_t eleSize) {
+void TFRTEngine::addInput(std::string layer, nvinfer1::DimsCHW dims,size_t eleSize) {
 	/*
 	 Register tensorflow input
 	 Even if channel index is last in the data, put it first for TensorRT
@@ -53,12 +52,12 @@ void TFRTEngine::addInput(string layer, nvinfer1::DimsCHW dims,
 	 Input(shape=(Y, X, C))
 	 Where Y = 30, X = 40, C = 1
 	 */
-	parser->registerInput(layer.c_str(), dims);
+	parser->registerInput(layer.c_str(), dims, UffInputOrder::kNCHW);
 
 	/* Save the size for inferences */
 	networkInputs.push_back(volume(dims) * eleSize);
 }
-void TFRTEngine::addOutput(string layer, size_t eleSize) {
+void TFRTEngine::addOutput(std::string layer, size_t eleSize) {
 	/*
 	 Name of last operation of last non optimizer layer found with
 	 `convert_to_uff.py tensorflow --input-file graph.pb -l`
@@ -73,7 +72,7 @@ void TFRTEngine::addOutput(string layer, size_t eleSize) {
 void TFRTEngine::allocGPUBuffer() {
 	int stepSize = networkInputs.size() + networkOutputs.size();
 
-	GPU_Buffers = vector<void*>(maxBatchSize * stepSize);
+	GPU_Buffers = std::vector<void*>(maxBatchSize * stepSize);
 
 	/* Allocate GPU Input memory and move input data to it for each batch*/
 	for (int b = 0; b < maxBatchSize; b++) {
@@ -148,6 +147,7 @@ bool TFRTEngine::loadUff(const char* uffFile, size_t maximumBatchSize,
 
 	/* Allocate Buffers */
 	allocGPUBuffer();
+	RETURN_AND_LOG(true, INFO, "Engine created");
 
 }
 
@@ -204,7 +204,7 @@ std::vector<std::vector<void*>> TFRTEngine::predict(
 
 }
 
-string TFRTEngine::engineSummary() {
+std::string TFRTEngine::engineSummary() {
 
 	std::stringstream summary;
 

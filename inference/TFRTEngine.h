@@ -18,13 +18,13 @@ public:
 	TFRTEngine();
 	virtual ~TFRTEngine();
 
-	void addInput(string, nvinfer1::DimsCHW, size_t);
-	void addOutput(string, size_t);
+	void addInput(std::string, nvinfer1::DimsCHW, size_t);
+	void addOutput(std::string, size_t);
 	bool loadUff(const char*, size_t, nvinfer1::DataType);
 
 	std::vector<std::vector<void*>> predict(std::vector<std::vector<void*>>);
 
-	string engineSummary();
+	std::string engineSummary();
 
 private:
 	ICudaEngine* engine;
@@ -35,8 +35,8 @@ private:
 	int maxBatchSize;
 	int numBindings;
 
-	vector<size_t> networkInputs;
-	vector<size_t> networkOutputs;
+	std::vector<size_t> networkInputs;
+	std::vector<size_t> networkOutputs;
 
 	std::vector<void*> GPU_Buffers;
 
